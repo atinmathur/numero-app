@@ -1,167 +1,171 @@
 /* Resetting some defaults for better cross-browser compatibility */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 /* Body styling */
 body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    color: #333;
-    background-color: #f4f4f9;
-    padding: 20px;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f4f4f9;
+  padding: 20px;
 }
 
 /* General container styling */
 .container {
-    width: 100%;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 20px;
-    background: #fff;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background: #fff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+}
+
+.section {
+  background-color: #f77;
 }
 
 /* Heading styles */
 h1,
 h2,
 h3 {
-    color: #444;
-    margin-bottom: 20px;
-    text-align: center;
+  color: #444;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 /* Form styling */
 form {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 label {
-    display: block;
-    margin-bottom: 5px;
-    font-weight: bold;
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
 }
 
 input[type="text"],
 input[type="date"],
 button {
-    display: block;
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    font-size: 16px;
+  display: block;
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  font-size: 16px;
 }
 
 button {
-    background-color: #007BFF;
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
 }
 
 button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* Results section */
 h2 {
-    margin-top: 30px;
+  margin-top: 30px;
 }
 
 p {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
 table td,
 table th {
-    border: 1px solid #ddd;
-    padding: 10px;
-    text-align: center;
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
 }
 
 table th {
-    background-color: #007BFF;
-    color: white;
-    font-weight: bold;
+  background-color: #007bff;
+  color: white;
+  font-weight: bold;
 }
 
 table tr:nth-child(even) {
-    background-color: #f9f9f9;
+  background-color: #f9f9f9;
 }
 
 table tr:hover {
-    background-color: #f1f1f1;
+  background-color: #f1f1f1;
 }
 
 /* Adding subscript styling */
 .cell-value {
-    display: inline-block;
-    font-size: 18px;
-    font-weight: bold;
-    margin-right: 5px;
+  display: inline-block;
+  font-size: 18px;
+  font-weight: bold;
+  margin-right: 5px;
 }
 
 .digit-sub {
-    font-size: 12px;
-    color: #666;
-    vertical-align: baseline;
+  font-size: 12px;
+  color: #666;
+  vertical-align: baseline;
 }
 
 /* Missing numbers list */
 strong {
-    color: #007BFF;
+  color: #007bff;
 }
 
 /* Footer styling (if needed) */
 footer {
-    margin-top: 40px;
-    text-align: center;
-    color: #666;
-    font-size: 14px;
+  margin-top: 40px;
+  text-align: center;
+  color: #666;
+  font-size: 14px;
 }
 
 /* Media Queries */
 
 /* Larger screens (laptops and desktops) */
 @media (min-width: 1024px) {
-    .container {
-        width: 60%;
-    }
+  .container {
+    width: 60%;
+  }
 }
 
 /* Medium screens (tablets) */
 @media (min-width: 768px) and (max-width: 1023px) {
-    .container {
-        width: 80%;
-    }
+  .container {
+    width: 80%;
+  }
 }
 
 /* Small screens (mobile devices) */
 @media (max-width: 767px) {
-    .container {
-        width: 100%;
-        padding: 15px;
-    }
+  .container {
+    width: 100%;
+    padding: 15px;
+  }
 
-    table td,
-    table th {
-        font-size: 14px;
-        padding: 8px;
-    }
+  table td,
+  table th {
+    font-size: 14px;
+    padding: 8px;
+  }
 
-    button {
-        font-size: 14px;
-    }
+  button {
+    font-size: 14px;
+  }
 }

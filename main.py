@@ -2,6 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
+from datetime import datetime
 import os
 import itertools
 
@@ -93,8 +94,6 @@ VEDIC_MATRIX = [
     [2, 8, 4]
 ]
 
-
-
 def generate_vedic_grid_dynamic(birthdate: str):
     """
     Generate a 3x3 Vedic numerology grid where numbers appear based on their frequency in the DOB.
@@ -105,7 +104,11 @@ def generate_vedic_grid_dynamic(birthdate: str):
     # Count occurrences of each number in the DOB
     dob_digits = [int(digit) for digit in birthdate if digit.isdigit()]
     dob_digits.append(calculate_destiny_number(birthdate))  # Add Destiny Number
-    dob_digits.append(calculate_root_number(birthdate))  # Add Root Number
+    
+    day = int(birthdate.split('-')[2])
+    if day > 9 and day not in [10, 20, 30]:
+        dob_digits.append(calculate_root_number(birthdate))  # Add Root Number
+
     # remove first 2 digits
     dob_digits = dob_digits[2:]
     frequency = {num: dob_digits.count(num) for num in range(1, 10)}
@@ -120,13 +123,58 @@ def generate_vedic_grid_dynamic(birthdate: str):
 
     return grid
 
-def find_missing_numbers_dynamic(birthdate: str):
+def calculate_mahadasha_periods(birthdate: str, num_cycles: int = 2) -> list:
     """
-    Identify numbers missing in the DOB.
+    Calculate Mahadasha periods starting from the birthday, based on the Root Number.
+
+    Args:
+    - birthdate (str): Birthdate in the format 'YYYY-MM-DD'
+    - num_cycles (int): Number of Mahadasha cycles to calculate (default: 2)
+
+    Returns:
+    - list: A list of dictionaries containing Mahadasha start year, duration, and end year.
     """
-    dob_digits = set(int(digit) for digit in birthdate if digit.isdigit())
-    all_numbers = set(range(1, 10))
-    return sorted(all_numbers - dob_digits)
+    # Parse the birthdate
+    birthdate_dt = datetime.strptime(birthdate, "%Y-%m-%d")
+    
+    # Extract the Root Number from the day
+    day = int(birthdate_dt.day)
+    root_number = sum(int(digit) for digit in str(day))
+    while root_number > 9:
+        root_number = sum(int(digit) for digit in str(root_number))
+    
+    # Generate Mahadasha durations in the correct sequence
+    durations = []
+    start = root_number
+    for _ in range(9):  # One complete cycle
+        durations.append(start)
+        start += 1
+        if start > 9:
+            start = 1
+
+    durations = durations * num_cycles  # Repeat the cycles
+
+    # Initialize Mahadasha periods
+    mahadasha_periods = []
+    current_date = birthdate_dt
+
+    for duration in durations:
+        start_date = current_date
+        end_date = current_date.replace(year=current_date.year + duration)
+
+        start_age = current_date.year - birthdate_dt.year
+        end_age = end_date.year - birthdate_dt.year
+        
+        mahadasha_periods.append({
+            "start_date": start_date.strftime("%Y-%m-%d"),
+            "end_date": end_date.strftime("%Y-%m-%d"),
+            "duration": duration,
+            "running_age": f"{start_age} - {end_age}", 
+        })
+        current_date = end_date
+
+    return mahadasha_periods
+
 
 # Root route for form submission
 @app.get("/", response_class=HTMLResponse)
@@ -138,7 +186,7 @@ async def get_form(request: Request):
 async def post_result(request: Request, name: str = Form(...), birthdate: str = Form(...)):
     chaldean_number = calculate_chaldean_number(name)
     vedic_grid = generate_vedic_grid_dynamic(birthdate)
-    missing_numbers = find_missing_numbers_dynamic(birthdate)
+    mahadasha_periods = calculate_mahadasha_periods(birthdate)
     
     return templates.TemplateResponse(
         "index.html",
@@ -150,7 +198,7 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
                 "chaldean_number": chaldean_number,
                 "vedic_grid": vedic_grid,
                 "grid_layout": VEDIC_MATRIX,  # Original matrix for subscripts
-                "missing_numbers": missing_numbers,
+                "mahadasha_periods": mahadasha_periods,
             },
         },
     )
