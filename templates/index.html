@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Numerology Calculator</title>
-    <link rel="stylesheet" href="/static/styles.css?v=2.0" />
+    <link rel="stylesheet" href="/static/styles.css" />
   </head>
   <body>
     <div class="container">
@@ -53,9 +53,10 @@
             <tr>
               <th>Year</th>
               <th>Start Date</th>
-              <th>Mahadasha</th>
-              <th>Antardasha</th>
-              <th>Running Age</th>
+              <th>Maha Dasha</th>
+              <th>Antar Dasha</th>
+              <th>Age</th>
+              <th>Grid</th>
             </tr>
           </thead>
           <tbody>
@@ -66,6 +67,9 @@
               <td>{{ period.mahadasha }}</td>
               <td>{{ period.antardasha }}</td>
               <td>{{ period.running_age }}</td>
+              <td>
+                <button class="show-grid">Show</button>
+              </td>
             </tr>
             {% endfor %}
           </tbody>
@@ -167,7 +171,7 @@
         paginate();
         const rows = document.querySelectorAll(".mahadasha tbody tr");
         rows.forEach((row) => {
-          row.addEventListener("click", () => {
+          row.querySelector("button").addEventListener("click", () => {
             const year = row
               .querySelector("td:nth-child(1)")
               .textContent.trim();
