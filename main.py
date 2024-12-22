@@ -210,9 +210,9 @@ def update_vedic_grid(base_grid, mahadasha, antardasha):
 
             # Append Mahadasha or Antardasha if the position matches
             if cell == mahadasha:
-                current_value += str(mahadasha)
+                current_value += '[' + str(mahadasha) + ']'
             if cell == antardasha:
-                current_value += str(antardasha)
+                current_value += '(' + str(antardasha) + ')'
 
             updated_row.append(current_value)
         updated_grid.append(updated_row)
