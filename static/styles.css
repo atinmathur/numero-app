@@ -25,6 +25,10 @@ body {
   border-radius: 8px;
 }
 
+.section {
+  margin: 20px 0 20px 0;
+}
+
 /* Heading styles */
 h1,
 h2,
@@ -83,6 +87,7 @@ table {
   border-collapse: collapse;
   margin-top: 20px;
   margin-bottom: 20px;
+  table-layout: fixed;
 }
 
 table td,
@@ -90,6 +95,8 @@ table th {
   border: 1px solid #ddd;
   padding: 10px;
   text-align: center;
+  width: 33%;
+  height: 50px;
 }
 
 table th {
@@ -103,7 +110,13 @@ table tr:nth-child(even) {
 }
 
 table tr:hover {
-  background-color: #f1f1f1;
+  background-color: #4caf50;
+  color: #fff;
+  font-weight: bold;
+}
+
+.mahadasha table {
+  cursor: pointer;
 }
 
 .pagination {
@@ -126,6 +139,7 @@ table tr:hover {
 .pagination button.active {
   background-color: #4caf50;
   color: white;
+  font-weight: bold;
 }
 
 .pagination button:hover {
@@ -149,7 +163,7 @@ table tr:hover {
 
 /* Missing numbers list */
 strong {
-  color: #007bff;
+  color: #4caf50;
 }
 
 /* Footer styling (if needed) */

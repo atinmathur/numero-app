@@ -1,10 +1,11 @@
 from fastapi import FastAPI, Request, Form
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from datetime import datetime
 import os
 import itertools
+import json
 
 # Initialize FastAPI app
 app = FastAPI()
@@ -187,7 +188,7 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
             "request": request,
             "results": {
                 "name": name,
-                "birthdate": birthdate,
+                "birthdate": datetime.strptime(birthdate, "%Y-%m-%d").strftime("%d-%m-%Y"),
                 "chaldean_number": chaldean_number,
                 "vedic_grid": vedic_grid,
                 "grid_layout": VEDIC_MATRIX,  # Original matrix for subscripts
@@ -196,3 +197,41 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
         },
     )
 
+# Function to update the grid based on Mahadasha and Antardasha
+def update_vedic_grid(base_grid, mahadasha, antardasha):
+    # Create a new updated grid
+    updated_grid = []
+
+    for row_index, row in enumerate(VEDIC_MATRIX):  # Iterate through the original Vedic matrix
+        updated_row = []
+        for col_index, cell in enumerate(row):
+            # Get the current cell value from the base grid
+            current_value = base_grid[row_index][col_index]
+
+            # Append Mahadasha or Antardasha if the position matches
+            if cell == mahadasha:
+                current_value += str(mahadasha)
+            if cell == antardasha:
+                current_value += str(antardasha)
+
+            updated_row.append(current_value)
+        updated_grid.append(updated_row)
+
+    return updated_grid
+
+# Add endpoint for dynamically updating grid based on Mahadasha and Antardasha
+@app.get("/update-grid")
+async def update_grid(
+    mahadasha: int, 
+    antardasha: int, 
+    base_grid: str
+):
+    # Convert the base grid from JSON string to Python list
+    base_grid = json.loads(base_grid)
+    print(base_grid)
+    
+    # Define your updated grid logic here
+    updated_grid = update_vedic_grid(base_grid, mahadasha, antardasha)
+    
+    # Return updated grid as JSON response
+    return JSONResponse(content={"updated_grid": updated_grid})

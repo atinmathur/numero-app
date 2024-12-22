@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Numerology Calculator</title>
-    <link rel="stylesheet" href="/static/styles.css?v=1.2" />
+    <link rel="stylesheet" href="/static/styles.css?v=2.0" />
   </head>
   <body>
     <div class="container">
@@ -22,14 +22,14 @@
 
       {% if results %}
 
-      <div class="sections">
+      <div class="section">
         <h2>Results</h2>
         <p><strong>Name:</strong> {{ results.name }}</p>
         <p><strong>Birthdate:</strong> {{ results.birthdate }}</p>
         <p><strong>Name Numerology:</strong> {{ results.chaldean_number }}</p>
       </div>
 
-      <div class="sections">
+      <div class="section vedic-grid">
         <h3>Base Grid</h3>
         <table>
           <tbody>
@@ -46,8 +46,8 @@
         </table>
       </div>
 
-      <div class="sections mahadasha">
-        <h2>Mahadasha Periods</h2>
+      <div class="section mahadasha">
+        <h2>Mahadasha - Antardasha</h2>
         <table>
           <thead>
             <tr>
@@ -74,6 +74,14 @@
         <div class="pagination"></div>
       </div>
 
+      <div class="section">
+        <div id="updated-grid-section" style="display: none">
+          <h3>Yearly Grid</h3>
+          <table id="updated-grid">
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
       {% endif %}
     </div>
 
@@ -108,7 +116,71 @@
         }
       }
 
-      document.addEventListener("DOMContentLoaded", () => paginate());
+      async function handleRowClick(year, mahadasha, antardasha) {
+        const baseGrid = [];
+        const gridRows = document.querySelectorAll(".vedic-grid tbody tr");
+        gridRows.forEach((row) => {
+          const rowData = [];
+          const cells = row.querySelectorAll("td");
+          cells.forEach((cell) => {
+            rowData.push(cell.textContent.trim());
+          });
+          baseGrid.push(rowData);
+        });
+
+        const baseGridJson = JSON.stringify(baseGrid);
+
+        const response = await fetch(
+          `/update-grid?mahadasha=${mahadasha}&antardasha=${antardasha}&base_grid=${encodeURIComponent(
+            baseGridJson
+          )}`
+        );
+        const data = await response.json();
+        displayUpdatedGrid(year, data.updated_grid);
+      }
+
+      function displayUpdatedGrid(year, updatedGrid) {
+        const updatedGridSection = document.querySelector(
+          "#updated-grid-section h3"
+        );
+        updatedGridSection.textContent = `Year: ${year}`;
+
+        const gridContainer = document.querySelector("#updated-grid");
+        gridContainer.innerHTML = "";
+
+        const table = document.createElement("table");
+        updatedGrid.forEach((row) => {
+          const tr = document.createElement("tr");
+          row.forEach((cell) => {
+            const td = document.createElement("td");
+            td.textContent = cell;
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+
+        gridContainer.appendChild(table);
+        gridContainer.parentElement.style.display = "block";
+      }
+
+      document.addEventListener("DOMContentLoaded", () => {
+        paginate();
+        const rows = document.querySelectorAll(".mahadasha tbody tr");
+        rows.forEach((row) => {
+          row.addEventListener("click", () => {
+            const year = row
+              .querySelector("td:nth-child(1)")
+              .textContent.trim();
+            const mahadasha = row
+              .querySelector("td:nth-child(3)")
+              .textContent.trim();
+            const antardasha = row
+              .querySelector("td:nth-child(4)")
+              .textContent.trim();
+            handleRowClick(year, mahadasha, antardasha);
+          });
+        });
+      });
     </script>
   </body>
 </html>
