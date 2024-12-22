@@ -123,57 +123,50 @@ def generate_vedic_grid_dynamic(birthdate: str):
 
     return grid
 
-def calculate_mahadasha_periods(birthdate: str, num_cycles: int = 2) -> list:
-    """
-    Calculate Mahadasha periods starting from the birthday, based on the Root Number.
-
-    Args:
-    - birthdate (str): Birthdate in the format 'YYYY-MM-DD'
-    - num_cycles (int): Number of Mahadasha cycles to calculate (default: 2)
-
-    Returns:
-    - list: A list of dictionaries containing Mahadasha start year, duration, and end year.
-    """
-    # Parse the birthdate
+def calculate_mahadasha_antardasha(birthdate: str, num_years: int = 90):
     birthdate_dt = datetime.strptime(birthdate, "%Y-%m-%d")
-    
-    # Extract the Root Number from the day
-    day = int(birthdate_dt.day)
+    day, month, year = birthdate_dt.day, birthdate_dt.month, birthdate_dt.year
     root_number = sum(int(digit) for digit in str(day))
     while root_number > 9:
         root_number = sum(int(digit) for digit in str(root_number))
-    
-    # Generate Mahadasha durations in the correct sequence
-    durations = []
+
+    mahadasha_order = []
     start = root_number
-    for _ in range(9):  # One complete cycle
-        durations.append(start)
+    for _ in range(9):  # One cycle
+        mahadasha_order.append(start)
         start += 1
         if start > 9:
             start = 1
 
-    durations = durations * num_cycles  # Repeat the cycles
+    results = []
+    current_year = year
+    mahadasha_index = 0
+    mahadasha_start_year = year
 
-    # Initialize Mahadasha periods
-    mahadasha_periods = []
-    current_date = birthdate_dt
+    for i in range(num_years):
+        current_birthday = datetime(current_year + i, month, day)
+        if current_year + i >= mahadasha_start_year + mahadasha_order[mahadasha_index]:
+            mahadasha_index = (mahadasha_index + 1) % len(mahadasha_order)
+            mahadasha_start_year = current_year + i
 
-    for duration in durations:
-        start_date = current_date
-        end_date = current_date.replace(year=current_date.year + duration)
-
-        start_age = current_date.year - birthdate_dt.year
-        end_age = end_date.year - birthdate_dt.year
-        
-        mahadasha_periods.append({
-            "start_date": start_date.strftime("%Y-%m-%d"),
-            "end_date": end_date.strftime("%Y-%m-%d"),
-            "duration": duration,
-            "running_age": f"{start_age} - {end_age}", 
+        mahadasha = mahadasha_order[mahadasha_index]
+        sum_dob = day + month + (current_year + i) % 100
+        weekday = current_birthday.weekday()
+        weekday_map = {0: 2, 1: 9, 2: 5, 3: 3, 4: 6, 5: 8, 6: 1}
+        sum_dob += weekday_map[weekday]
+        while sum_dob > 9:
+            sum_dob = sum(int(digit) for digit in str(sum_dob))
+        antardasha = sum_dob
+        running_age = (current_year + i) - year + 1
+        results.append({
+            "year": current_year + i,
+            "start_date": current_birthday.strftime("%d-%m-%Y"),
+            "running_age": running_age,
+            "mahadasha": mahadasha,
+            "antardasha": antardasha,
         })
-        current_date = end_date
 
-    return mahadasha_periods
+    return results
 
 
 # Root route for form submission
@@ -186,7 +179,7 @@ async def get_form(request: Request):
 async def post_result(request: Request, name: str = Form(...), birthdate: str = Form(...)):
     chaldean_number = calculate_chaldean_number(name)
     vedic_grid = generate_vedic_grid_dynamic(birthdate)
-    mahadasha_periods = calculate_mahadasha_periods(birthdate)
+    mahadasha_periods = calculate_mahadasha_antardasha(birthdate)
     
     return templates.TemplateResponse(
         "index.html",

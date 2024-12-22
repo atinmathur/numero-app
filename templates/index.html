@@ -4,11 +4,12 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Numerology Calculator</title>
-    <link rel="stylesheet" href="/static/styles.css" />
+    <link rel="stylesheet" href="/static/styles.css?v=1.2" />
   </head>
   <body>
     <div class="container">
       <h1>Numerology Calculator</h1>
+
       <form action="/result" method="post">
         <label for="name">Enter your Name:</label>
         <input type="text" id="name" name="name" required />
@@ -20,13 +21,15 @@
       </form>
 
       {% if results %}
-      <div class="section">
+
+      <div class="sections">
         <h2>Results</h2>
         <p><strong>Name:</strong> {{ results.name }}</p>
         <p><strong>Birthdate:</strong> {{ results.birthdate }}</p>
         <p><strong>Name Numerology:</strong> {{ results.chaldean_number }}</p>
       </div>
-      <div class="section">
+
+      <div class="sections">
         <h3>Base Grid</h3>
         <table>
           <tbody>
@@ -43,30 +46,69 @@
         </table>
       </div>
 
-      <div class="section">
+      <div class="sections mahadasha">
         <h2>Mahadasha Periods</h2>
         <table>
           <thead>
             <tr>
+              <th>Year</th>
               <th>Start Date</th>
-              <th>End Date</th>
-              <th>Duration (Years)</th>
+              <th>Mahadasha</th>
+              <th>Antardasha</th>
               <th>Running Age</th>
             </tr>
           </thead>
           <tbody>
             {% for period in results.mahadasha_periods %}
             <tr>
+              <td>{{ period.year }}</td>
               <td>{{ period.start_date }}</td>
-              <td>{{ period.end_date }}</td>
-              <td>{{ period.duration }}</td>
+              <td>{{ period.mahadasha }}</td>
+              <td>{{ period.antardasha }}</td>
               <td>{{ period.running_age }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+
+        <div class="pagination"></div>
       </div>
+
       {% endif %}
     </div>
+
+    <script>
+      let currentPage = 1;
+      const pageSize = 10;
+
+      function paginate() {
+        const rows = document.querySelectorAll(".mahadasha tbody tr");
+        const totalPages = Math.ceil(rows.length / pageSize);
+
+        rows.forEach((row, index) => {
+          row.style.display =
+            index >= (currentPage - 1) * pageSize &&
+            index < currentPage * pageSize
+              ? ""
+              : "none";
+        });
+
+        const pagination = document.querySelector(".pagination");
+        pagination.innerHTML = "";
+        for (let i = 1; i <= totalPages; i++) {
+          const button = document.createElement("button");
+          button.className = i === currentPage ? "active" : "";
+          button.onclick = () => {
+            currentPage = i;
+            paginate();
+          };
+
+          button.textContent = i;
+          pagination.appendChild(button);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", () => paginate());
+    </script>
   </body>
 </html>

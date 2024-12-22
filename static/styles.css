@@ -25,10 +25,6 @@ body {
   border-radius: 8px;
 }
 
-.section {
-  background-color: #f77;
-}
-
 /* Heading styles */
 h1,
 h2,
@@ -62,7 +58,7 @@ button {
 }
 
 button {
-  background-color: #007bff;
+  background-color: #4caf50;
   color: white;
   border: none;
   cursor: pointer;
@@ -70,7 +66,7 @@ button {
 }
 
 button:hover {
-  background-color: #0056b3;
+  background-color: #45a049;
 }
 
 /* Results section */
@@ -86,6 +82,7 @@ table {
   width: 100%;
   border-collapse: collapse;
   margin-top: 20px;
+  margin-bottom: 20px;
 }
 
 table td,
@@ -96,7 +93,7 @@ table th {
 }
 
 table th {
-  background-color: #007bff;
+  background-color: #4caf50;
   color: white;
   font-weight: bold;
 }
@@ -107,6 +104,33 @@ table tr:nth-child(even) {
 
 table tr:hover {
   background-color: #f1f1f1;
+}
+
+.pagination {
+  margin-top: 20px;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Align buttons horizontally */
+}
+
+.pagination button {
+  padding: 5px 10px;
+  margin: 5px;
+  border: 1px solid #ccc;
+  background-color: #fff;
+  color: #333;
+  cursor: pointer;
+  display: inline-block; /* Ensure buttons are aligned horizontally */
+}
+
+.pagination button.active {
+  background-color: #4caf50;
+  color: white;
+}
+
+.pagination button:hover {
+  background-color: #4caf49;
+  color: white;
 }
 
 /* Adding subscript styling */
