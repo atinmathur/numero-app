@@ -2,7 +2,7 @@ from fastapi import FastAPI, Request, Form
 from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from datetime import datetime
+from datetime import datetime, timedelta
 import os
 import itertools
 import json
@@ -197,8 +197,15 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
         },
     )
 
+# Function to check if a given year is a leap year
+def is_leap_year(year):
+    if (year % 4 == 0 and year % 100 != 0) or (year % 400 == 0):
+        return True
+    else:
+        return False
+
 # Function to update the grid based on Mahadasha and Antardasha
-def update_vedic_grid(base_grid, mahadasha, antardasha):
+def update_vedic_grid(base_grid, mahadasha, antardasha, start_date):
     # Create a new updated grid
     updated_grid = []
 
@@ -217,21 +224,57 @@ def update_vedic_grid(base_grid, mahadasha, antardasha):
             updated_row.append(current_value)
         updated_grid.append(updated_row)
 
-    return updated_grid
+    date_ranges = []
+    current_date = datetime.strptime(start_date, "%d-%m-%Y")
+
+    # Check if the current year is a leap year
+    leap_year_bool = False
+    if current_date.month <= 2:
+        leap_year_bool = is_leap_year(current_date.year)
+    else:
+        leap_year_bool = is_leap_year(current_date.year + 1)
+
+    # Calculate the multiplication factor based on leap year
+    if leap_year_bool:
+        mul_factor = 8.13
+    else:
+        mul_factor = 8.11
+
+    for number in range(antardasha, 10):
+        days = round(number * mul_factor)
+        end_date = current_date + timedelta(days=days-1)
+        date_ranges.append({
+            "start_date": current_date.strftime("%d-%m-%Y"),
+            "end_date": end_date.strftime("%d-%m-%Y"),
+            "number": number
+        })
+        current_date = end_date + timedelta(days=1)
+    
+    for number in range(1, antardasha):
+        days = round(number * mul_factor)
+        end_date = current_date + timedelta(days=days-1)
+        date_ranges.append({
+            "start_date": current_date.strftime("%d-%m-%Y"),
+            "end_date": end_date.strftime("%d-%m-%Y"),
+            "number": number
+        })
+        current_date = end_date + timedelta(days=1)
+    
+    return (updated_grid, date_ranges)
 
 # Add endpoint for dynamically updating grid based on Mahadasha and Antardasha
 @app.get("/update-grid")
 async def update_grid(
     mahadasha: int, 
-    antardasha: int, 
+    antardasha: int,
+    start_date: str,
     base_grid: str
 ):
     # Convert the base grid from JSON string to Python list
     base_grid = json.loads(base_grid)
-    print(base_grid)
     
     # Define your updated grid logic here
-    updated_grid = update_vedic_grid(base_grid, mahadasha, antardasha)
+    (updated_grid, date_ranges) = update_vedic_grid(base_grid, mahadasha, antardasha, start_date)
     
     # Return updated grid as JSON response
-    return JSONResponse(content={"updated_grid": updated_grid})
+    return JSONResponse(content={"updated_grid": updated_grid, "date_ranges": date_ranges})

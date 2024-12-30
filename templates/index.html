@@ -84,6 +84,7 @@
           <table id="updated-grid">
             <tbody></tbody>
           </table>
+          <div id="range-table"></div>
         </div>
       </div>
       {% endif %}
@@ -120,7 +121,7 @@
         }
       }
 
-      async function handleRowClick(year, mahadasha, antardasha) {
+      async function handleRowClick(year, startDate, mahadasha, antardasha) {
         const baseGrid = [];
         const gridRows = document.querySelectorAll(".vedic-grid tbody tr");
         gridRows.forEach((row) => {
@@ -135,12 +136,58 @@
         const baseGridJson = JSON.stringify(baseGrid);
 
         const response = await fetch(
-          `/update-grid?mahadasha=${mahadasha}&antardasha=${antardasha}&base_grid=${encodeURIComponent(
+          `/update-grid?mahadasha=${mahadasha}&antardasha=${antardasha}&start_date=${startDate}&base_grid=${encodeURIComponent(
             baseGridJson
           )}`
         );
         const data = await response.json();
         displayUpdatedGrid(year, data.updated_grid);
+        displayDateRanges(data.date_ranges);
+      }
+
+      function displayDateRanges(dateRanges) {
+        const dateRangesSection = document.createElement("div");
+        dateRangesSection.className = "date-ranges-section";
+
+        const table = document.createElement("table");
+        const thead = document.createElement("thead");
+        const tbody = document.createElement("tbody");
+
+        const headerRow = document.createElement("tr");
+        const headers = ["Start Date", "End Date", "Pratyantar"];
+        headers.forEach((header) => {
+          const th = document.createElement("th");
+          th.textContent = header;
+          headerRow.appendChild(th);
+        });
+        thead.appendChild(headerRow);
+
+        dateRanges.forEach((item) => {
+          const range = item;
+          const row = document.createElement("tr");
+
+          const startDateTd = document.createElement("td");
+          startDateTd.textContent = range.start_date;
+          row.appendChild(startDateTd);
+
+          const endDateTd = document.createElement("td");
+          endDateTd.textContent = range.end_date;
+          row.appendChild(endDateTd);
+
+          const numberTd = document.createElement("td");
+          numberTd.textContent = item.number;
+          row.appendChild(numberTd);
+
+          tbody.appendChild(row);
+        });
+
+        table.appendChild(thead);
+        table.appendChild(tbody);
+        dateRangesSection.appendChild(table);
+
+        const container = document.querySelector("#range-table");
+        container.innerHTML = "";
+        container.appendChild(dateRangesSection);
       }
 
       function displayUpdatedGrid(year, updatedGrid) {
@@ -175,13 +222,16 @@
             const year = row
               .querySelector("td:nth-child(1)")
               .textContent.trim();
+            const startDate = row
+              .querySelector("td:nth-child(2)")
+              .textContent.trim();
             const mahadasha = row
               .querySelector("td:nth-child(3)")
               .textContent.trim();
             const antardasha = row
               .querySelector("td:nth-child(4)")
               .textContent.trim();
-            handleRowClick(year, mahadasha, antardasha);
+            handleRowClick(year, startDate, mahadasha, antardasha);
           });
         });
       });
