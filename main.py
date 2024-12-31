@@ -181,6 +181,8 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
     chaldean_number = calculate_chaldean_number(name)
     vedic_grid = generate_vedic_grid_dynamic(birthdate)
     mahadasha_periods = calculate_mahadasha_antardasha(birthdate)
+    destiny_number = calculate_destiny_number(birthdate)
+    root_number = calculate_root_number(birthdate)
     
     return templates.TemplateResponse(
         "index.html",
@@ -190,6 +192,8 @@ async def post_result(request: Request, name: str = Form(...), birthdate: str = 
                 "name": name,
                 "birthdate": datetime.strptime(birthdate, "%Y-%m-%d").strftime("%d-%m-%Y"),
                 "chaldean_number": chaldean_number,
+                "destiny_number": destiny_number,
+                "root_number": root_number,
                 "vedic_grid": vedic_grid,
                 "grid_layout": VEDIC_MATRIX,  # Original matrix for subscripts
                 "mahadasha_periods": mahadasha_periods,
